@@ -1,5 +1,6 @@
 import os
 import csv 
+import sys
 from datetime import datetime
 from meteostat import Point, Daily, Stations
 import pandas as pd
@@ -101,15 +102,15 @@ def compareData(average_temp, p_code, df_3):
 
 API_KEY = 'AIzaSyAoa8Sc-qHIjprPR0Fy_ixUTWyVvhk8iA4'
 
+df = pd.read_csv(str(sys.argv[1])) #convert main input csv to df
 
-df = pd.read_csv(r"C:\Users\joelq\Music\helloFresh\Engineer_test\Boxes.csv")
 newDataArray = []
-df_3 = pd.read_csv(r"C:\Users\joelq\Music\helloFresh\Engineer_test\Temperature_bands.csv")
+df_3 = pd.read_csv(str(sys.argv[2])) #convert secondary input csv to df
 
-#print(df_3)
+
 
 pd.options.display.max_rows = 9999
-for i in range(2000):
+for i in range(int(len(df))):
     in_year, in_month, in_day = convertDateFormat(i,df)
     p_code = postCodeFormat(df.iat[i,4])
     lati, longi = getGeoCoord(p_code)
@@ -121,11 +122,9 @@ for i in range(2000):
         average_temp = weatherFinder(lati, longi, 70,in_year, in_month, in_day) #get the average temp on the day
     
     
-    #print(p_code, average_temp) 
-    #print(compareData(average_temp, p_code, df_3))
-    newDataArray.append(compareData(average_temp, p_code, df_3))
-    #print(newDataArray)
+    
+    newDataArray.append(compareData(average_temp, p_code, df_3)) #use array to create df and join with original as a new df and convert to csv
+
 df_2 = pd.DataFrame(newDataArray, columns =['S',	'M',	'L'])
-#print(df_2)
 df_final = (df.join(df_2))
-df_final.to_csv(r'C:\Users\joelq\Music\helloFresh\Output_data.csv', index=False)  
+df_final.to_csv(str(sys.argv[3]), index=False)  
